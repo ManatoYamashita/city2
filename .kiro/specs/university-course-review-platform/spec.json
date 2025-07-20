@@ -1,0 +1,28 @@
+{
+  "feature_name": "university-course-review-platform",
+  "project_description": "City2\n\n1. WebAppの種類 大学生向けに、履修登録時の参考にしてもらうための授業ごとの口コミサイト \n2. 詳細 \n    a. 機能: 授業の一覧、検索、概要、詳細、口コミ、評価、質問、課題の情報、難易度などについての情報の提供と登録、編集(就活で学生が参照する企業の口コミサイトのようなものをイメージしています。) \n    b. 目的: 履修登録前に授業のことについて、その授業を受けた先輩学生のリアルな声を知る\n    c. ターゲット: 大学の履修登録にどの授業を受講するか迷っている大学生  \n\n## その他 \n### ユーザー認証について \n1. 一般的なメールアドレスで認証を行います。\n2. 認証にsupabaseを使用\n### 対象範囲について \n2. まずは1つの大学を対象からにして、将来的に対象を広げていきます。 \n### データ管理 \n3. 授業情報(科目名、教員名、単位数など)は手動で登録してもらう\n* 過去問の機能は有料ユーザに提供したいので、Stripeでの決済も行いたい\n* Next.js 15 AppRouterを使用します。srcディレクトリは不要です。\n* tailwindCSS, ShadcnUIでUIを作成\n* 初期は費用を抑えてスケールするにつれてコストをかける\nuse context7詳細に設計を行ってください。 ultrathink",
+  "created_at": "2025-07-20T16:21:00Z",
+  "updated_at": "2025-07-20T16:42:00Z",
+  "language": "japanese",
+  "phase": "tasks-generated",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "progress": {
+    "requirements": 100,
+    "design": 100,
+    "tasks": 100
+  },
+  "ready_for_implementation": true
+}
