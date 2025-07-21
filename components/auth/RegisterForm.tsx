@@ -17,7 +17,7 @@ const registerSchema = z.object({
   password: z.string().min(8, 'パスワードは8文字以上で入力してください'),
   confirmPassword: z.string(),
   displayName: z.string().min(2, '表示名は2文字以上で入力してください'),
-  grade: z.number().min(1).max(6).optional(),
+  admission_year: z.string().optional().transform((val) => val && val !== '' ? parseInt(val) : undefined),
   department: z.string().optional(),
   faculty: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -40,7 +40,7 @@ export function RegisterForm() {
       password: '',
       confirmPassword: '',
       displayName: '',
-      grade: undefined,
+      admission_year: '',
       department: '',
       faculty: '',
     },
@@ -53,7 +53,7 @@ export function RegisterForm() {
     try {
       await signUp(data.email, data.password, {
         display_name: data.displayName,
-        grade: data.grade,
+        admission_year: data.admission_year,
         department: data.department,
         faculty: data.faculty,
       })
@@ -140,18 +140,17 @@ export function RegisterForm() {
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="grade"
+                name="admission_year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>学年（任意）</FormLabel>
+                    <FormLabel>入学年度（任意）</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="1"
-                        min={1}
-                        max={6}
+                        placeholder="2024"
+                        min={1900}
+                        max={2030}
                         {...field}
-                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                       />
                     </FormControl>
                     <FormMessage />

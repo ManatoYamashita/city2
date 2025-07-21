@@ -5,7 +5,7 @@ export interface Profile {
   university_id?: string
   display_name?: string
   student_id?: string
-  grade?: number
+  admission_year?: number
   department?: string
   faculty?: string
   avatar_url?: string
@@ -36,7 +36,7 @@ export interface SignUpData {
   email: string
   password: string
   displayName?: string
-  grade?: number
+  admission_year?: number
   department?: string
   faculty?: string
 }

@@ -77,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email,
         password,
         displayName: userData?.display_name,
-        grade: userData?.grade,
+        admission_year: userData?.admission_year,
         department: userData?.department,
         faculty: userData?.faculty,
       }

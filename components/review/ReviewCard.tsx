@@ -63,8 +63,10 @@ export function ReviewCard({
 
   const getAnonymousInfo = () => {
     const parts = []
-    if (review.anonymous_grade) {
-      parts.push(`${review.anonymous_grade}年生`)
+    if (review.anonymous_admission_year) {
+      const currentYear = new Date().getFullYear()
+      const yearsSinceAdmission = currentYear - review.anonymous_admission_year + 1
+      parts.push(`${yearsSinceAdmission}年生（${review.anonymous_admission_year}年入学）`)
     }
     if (review.anonymous_department) {
       parts.push(review.anonymous_department)

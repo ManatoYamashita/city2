@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       .select(`
         *,
         course:courses(id, name, instructor, course_code),
-        user:profiles(id, display_name, grade, department)
+        user:profiles(id, display_name, admission_year, department)
       `)
 
     // 検索条件の適用
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     // ユーザープロフィール取得（匿名化用）
     const { data: profile } = await supabase
       .from('profiles')
-      .select('grade, department')
+      .select('admission_year, department')
       .eq('id', user.id)
       .single()
 
@@ -172,13 +172,13 @@ export async function POST(request: NextRequest) {
       .insert({
         ...validatedData,
         user_id: user.id,
-        anonymous_grade: profile?.grade,
+        anonymous_admission_year: profile?.admission_year,
         anonymous_department: profile?.department,
       })
       .select(`
         *,
         course:courses(id, name, instructor, course_code),
-        user:profiles(id, display_name, grade, department)
+        user:profiles(id, display_name, admission_year, department)
       `)
       .single()
 

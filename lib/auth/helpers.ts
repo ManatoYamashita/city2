@@ -19,7 +19,7 @@ export const authHelpers = {
       options: {
         data: {
           display_name: data.displayName,
-          grade: data.grade,
+          admission_year: data.admission_year,
           department: data.department,
           faculty: data.faculty,
         }

@@ -16,7 +16,7 @@ export interface Review {
   advice?: string
   
   // 匿名化情報
-  anonymous_grade?: number
+  anonymous_admission_year?: number
   anonymous_department?: string
   
   // メタデータ
@@ -44,7 +44,7 @@ export interface Review {
   user?: {
     id: string
     display_name?: string
-    grade?: number
+    admission_year?: number
     department?: string
   }
 }

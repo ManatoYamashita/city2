@@ -87,7 +87,10 @@ export function CourseFilters({
   const handleFilterChange = (key: keyof CourseSearchParams, value: string | number | undefined) => {
     const newFilters = { ...localFilters, [key]: value }
     setLocalFilters(newFilters)
-    onChange(newFilters)
+    // 即座にonChangeを呼ばずに、値が実際に変更された場合のみ呼ぶ
+    if (localFilters[key] !== value) {
+      onChange(newFilters)
+    }
   }
 
   const handleApply = () => {
@@ -200,6 +203,7 @@ export function CourseFilters({
 
         {/* ソート */}
         <Select
+          key={`sort-${localFilters.sort || 'name'}`}
           value={localFilters.sort || 'name'}
           onValueChange={(value) => handleFilterChange('sort', value)}
         >
@@ -263,6 +267,7 @@ export function CourseFilters({
                   学部
                 </label>
                 <Select
+                  key={`faculty-${localFilters.faculty || ''}`}
                   value={localFilters.faculty || ''}
                   onValueChange={(value) => handleFilterChange('faculty', value || undefined)}
                 >
@@ -286,6 +291,7 @@ export function CourseFilters({
                   学科・専攻
                 </label>
                 <Select
+                  key={`department-${localFilters.department || ''}`}
                   value={localFilters.department || ''}
                   onValueChange={(value) => handleFilterChange('department', value || undefined)}
                 >
@@ -309,6 +315,7 @@ export function CourseFilters({
                   カテゴリ
                 </label>
                 <Select
+                  key={`category-${localFilters.category || ''}`}
                   value={localFilters.category || ''}
                   onValueChange={(value) => handleFilterChange('category', value || undefined)}
                 >
@@ -332,6 +339,7 @@ export function CourseFilters({
                   開講時期
                 </label>
                 <Select
+                  key={`semester-${localFilters.semester || ''}`}
                   value={localFilters.semester || ''}
                   onValueChange={(value) => handleFilterChange('semester', value || undefined)}
                 >
@@ -355,6 +363,7 @@ export function CourseFilters({
                   単位数
                 </label>
                 <Select
+                  key={`credits-${localFilters.credits || ''}`}
                   value={localFilters.credits ? localFilters.credits.toString() : ''}
                   onValueChange={(value) => handleFilterChange('credits', value ? parseInt(value) : undefined)}
                 >
@@ -378,6 +387,7 @@ export function CourseFilters({
                   最低評価
                 </label>
                 <Select
+                  key={`min_rating-${localFilters.min_rating || ''}`}
                   value={localFilters.min_rating ? localFilters.min_rating.toString() : ''}
                   onValueChange={(value) => handleFilterChange('min_rating', value ? parseFloat(value) : undefined)}
                 >

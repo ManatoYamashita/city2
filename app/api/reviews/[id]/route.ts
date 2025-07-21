@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .select(`
         *,
         course:courses(id, name, instructor, course_code, department, faculty),
-        user:profiles(id, display_name, grade, department)
+        user:profiles(id, display_name, admission_year, department)
       `)
       .eq('id', id)
       .single()
@@ -112,7 +112,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       .select(`
         *,
         course:courses(id, name, instructor, course_code, department, faculty),
-        user:profiles(id, display_name, grade, department)
+        user:profiles(id, display_name, admission_year, department)
       `)
       .single()
 
