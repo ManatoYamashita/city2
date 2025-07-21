@@ -84,7 +84,7 @@ export function CourseFilters({
     setLocalFilters(filters)
   }, [filters])
 
-  const handleFilterChange = (key: keyof CourseSearchParams, value: any) => {
+  const handleFilterChange = (key: keyof CourseSearchParams, value: string | number | undefined) => {
     const newFilters = { ...localFilters, [key]: value }
     setLocalFilters(newFilters)
     onChange(newFilters)

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { courseCreateSchema, courseSearchSchema } from '@/lib/validations/course'
-import { Course, CourseListResponse, CourseSearchParams } from '@/types/course'
+import { CourseListResponse, CourseSearchParams } from '@/types/course'
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       credits: searchParams.get('credits') ? parseInt(searchParams.get('credits')!) : undefined,
       min_rating: searchParams.get('min_rating') ? parseFloat(searchParams.get('min_rating')!) : undefined,
       max_difficulty: searchParams.get('max_difficulty') ? parseFloat(searchParams.get('max_difficulty')!) : undefined,
-      sort: searchParams.get('sort') as any || 'name',
+      sort: (searchParams.get('sort') || 'name') as 'name' | 'created_at' | 'average_rating' | 'total_reviews' | '-name' | '-created_at' | '-average_rating' | '-total_reviews',
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20,
     }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { CourseSearchParams } from '@/types/course'
+import { CourseSearchParams, CourseSortOption } from '@/types/course'
 
 interface UseCourseSearchOptions {
   defaultParams?: Partial<CourseSearchParams>
@@ -42,13 +42,13 @@ export function useCourseSearch(options: UseCourseSearchOptions = {}) {
       if (urlSearch) params.search = urlSearch
       if (urlDepartment) params.department = urlDepartment
       if (urlFaculty) params.faculty = urlFaculty
-      if (urlCategory) params.category = urlCategory as any
-      if (urlSemester) params.semester = urlSemester as any
+      if (urlCategory) params.category = urlCategory
+      if (urlSemester) params.semester = urlSemester
       if (urlYear) params.year = parseInt(urlYear)
       if (urlCredits) params.credits = parseInt(urlCredits)
       if (urlMinRating) params.min_rating = parseFloat(urlMinRating)
       if (urlMaxDifficulty) params.max_difficulty = parseFloat(urlMaxDifficulty)
-      if (urlSort) params.sort = urlSort as any
+      if (urlSort) params.sort = urlSort as CourseSortOption
       if (urlPage) params.page = parseInt(urlPage)
       if (urlLimit) params.limit = parseInt(urlLimit)
     }

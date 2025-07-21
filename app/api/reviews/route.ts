@@ -16,10 +16,10 @@ export async function GET(request: NextRequest) {
       max_rating: searchParams.get('max_rating') ? parseFloat(searchParams.get('max_rating')!) : undefined,
       min_difficulty: searchParams.get('min_difficulty') ? parseFloat(searchParams.get('min_difficulty')!) : undefined,
       max_difficulty: searchParams.get('max_difficulty') ? parseFloat(searchParams.get('max_difficulty')!) : undefined,
-      assignment_frequency: searchParams.get('assignment_frequency') as any || undefined,
-      grading_criteria: searchParams.get('grading_criteria') as any || undefined,
+      assignment_frequency: (searchParams.get('assignment_frequency') || undefined) as 'light' | 'moderate' | 'heavy' | undefined,
+      grading_criteria: (searchParams.get('grading_criteria') || undefined) as 'exam' | 'assignment' | 'participation' | 'mixed' | undefined,
       attendance_required: searchParams.get('attendance_required') ? searchParams.get('attendance_required') === 'true' : undefined,
-      sort: searchParams.get('sort') as any || '-created_at',
+      sort: (searchParams.get('sort') || '-created_at') as 'created_at' | 'updated_at' | 'overall_rating' | 'difficulty' | 'workload' | 'helpful_count' | '-created_at' | '-updated_at' | '-overall_rating' | '-difficulty' | '-workload' | '-helpful_count',
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20,
     }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { CourseCard } from './CourseCard'
-import { Course, CourseListResponse, CourseSearchParams } from '@/types/course'
+import { CourseListResponse, CourseSearchParams } from '@/types/course'
 import { Button } from '@/components/ui/button'
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -35,7 +35,7 @@ export function CourseList({ searchParams = {}, className }: CourseListProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const currentParams = {
+  const currentParams: CourseSearchParams = {
     page: 1,
     limit: 20,
     sort: 'name',

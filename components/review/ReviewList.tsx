@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ReviewCard } from './ReviewCard'
-import { Review, ReviewListResponse, ReviewSearchParams } from '@/types/review'
+import { ReviewListResponse, ReviewSearchParams, ReviewSortOption } from '@/types/review'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -64,10 +64,10 @@ export function ReviewList({
   const [error, setError] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<string>('-created_at')
 
-  const currentParams = {
+  const currentParams: ReviewSearchParams = {
     page: 1,
     limit: 10,
-    sort: sortBy,
+    sort: sortBy as ReviewSortOption,
     course_id: courseId,
     user_id: userId,
     ...searchParams,

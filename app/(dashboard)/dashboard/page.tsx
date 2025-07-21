@@ -75,7 +75,7 @@ function StatCard({
   title: string
   value: string | number
   description: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
 }) {
   return (
     <Card>

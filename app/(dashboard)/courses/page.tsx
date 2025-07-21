@@ -1,12 +1,11 @@
 'use client'
 
 import { Suspense } from 'react'
-import { Metadata } from 'next'
 import { SearchBar } from '@/components/search/SearchBar'
 import { CourseFilters } from '@/components/filters/CourseFilters'
 import { CourseList } from '@/components/course/CourseList'
 import { useCourseSearch } from '@/hooks/useCourseSearch'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 
 function CoursesPageContent() {
