@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CourseSearchParams, CourseSortOption } from '@/types/course'
 
@@ -13,9 +13,18 @@ export function useCourseSearch(options: UseCourseSearchOptions = {}) {
   const { defaultParams = {}, updateUrl = true } = options
   const router = useRouter()
   const searchParams = useSearchParams()
+  
+  // 循環参照を避けるためuseRefを使用
+  const paramsRef = useRef<CourseSearchParams>({
+    search: '',
+    sort: 'name',
+    page: 1,
+    limit: 20,
+    ...defaultParams,
+  })
 
-  // URLパラメータから初期状態を構築
-  const getInitialParams = useCallback((): CourseSearchParams => {
+  // URLパラメータから初期状態を構築（メモ化なし）
+  const getInitialParams = (): CourseSearchParams => {
     const params: CourseSearchParams = {
       search: '',
       sort: 'name',
@@ -54,34 +63,39 @@ export function useCourseSearch(options: UseCourseSearchOptions = {}) {
     }
 
     return params
-  }, [searchParams, defaultParams, updateUrl])
+  }
 
-  const [params, setParams] = useState<CourseSearchParams>(getInitialParams)
+  const [params, setParams] = useState<CourseSearchParams>(() => {
+    const initial = getInitialParams()
+    paramsRef.current = initial
+    return initial
+  })
 
-  // URLパラメータを更新
+  // URLパラメータを更新（依存配列を最小化）
   const updateUrlParams = useCallback((newParams: CourseSearchParams) => {
     if (!updateUrl) return
 
     const url = new URL(window.location.href)
-    const searchParams = new URLSearchParams()
+    const urlSearchParams = new URLSearchParams()
 
     // パラメータをURLに追加（空でない値のみ）
     Object.entries(newParams).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        searchParams.set(key, value.toString())
+        urlSearchParams.set(key, value.toString())
       }
     })
 
-    url.search = searchParams.toString()
+    url.search = urlSearchParams.toString()
     router.push(url.pathname + url.search, { scroll: false })
   }, [router, updateUrl])
 
-  // パラメータを更新
+  // パラメータを更新（paramsへの直接依存を削除）
   const updateParams = useCallback((newParams: Partial<CourseSearchParams>) => {
-    const updatedParams = { ...params, ...newParams }
+    const updatedParams = { ...paramsRef.current, ...newParams }
+    paramsRef.current = updatedParams
     setParams(updatedParams)
     updateUrlParams(updatedParams)
-  }, [params, updateUrlParams])
+  }, [updateUrlParams])
 
   // 検索実行
   const search = useCallback((searchTerm: string) => {
@@ -107,15 +121,25 @@ export function useCourseSearch(options: UseCourseSearchOptions = {}) {
       limit: 20,
       ...defaultParams,
     }
+    paramsRef.current = resetParams
     setParams(resetParams)
     updateUrlParams(resetParams)
   }, [defaultParams, updateUrlParams])
 
-  // URLパラメータの変更を監視
+  // URLパラメータの変更を監視（getInitialParamsの依存を削除）
   useEffect(() => {
     const newParams = getInitialParams()
-    setParams(newParams)
-  }, [searchParams, getInitialParams])
+    
+    // 実際に変更がある場合のみ更新
+    const hasChanges = Object.keys(newParams).some(key => 
+      newParams[key as keyof CourseSearchParams] !== paramsRef.current[key as keyof CourseSearchParams]
+    )
+    
+    if (hasChanges) {
+      paramsRef.current = newParams
+      setParams(newParams)
+    }
+  }, [searchParams]) // searchParamsのみに依存
 
   return {
     params,

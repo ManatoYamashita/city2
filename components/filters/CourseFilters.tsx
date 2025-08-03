@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -78,110 +78,103 @@ export function CourseFilters({
   className 
 }: CourseFiltersProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [localFilters, setLocalFilters] = useState(filters)
 
-  useEffect(() => {
-    setLocalFilters(filters)
-  }, [filters])
-
-  const handleFilterChange = (key: keyof CourseSearchParams, value: string | number | undefined) => {
-    const newFilters = { ...localFilters, [key]: value }
-    setLocalFilters(newFilters)
-    // 即座にonChangeを呼ばずに、値が実際に変更された場合のみ呼ぶ
-    if (localFilters[key] !== value) {
+  // localFiltersを削除し、直接filtersを使用
+  const handleFilterChange = useCallback((key: keyof CourseSearchParams, value: string | number | undefined) => {
+    // 値が実際に変更された場合のみ処理
+    if (filters[key] !== value) {
+      const newFilters = { ...filters, [key]: value }
       onChange(newFilters)
     }
-  }
+  }, [filters, onChange])
 
-  const handleApply = () => {
+  const handleApply = useCallback(() => {
     onApply?.()
     setIsOpen(false)
-  }
+  }, [onApply])
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     const clearedFilters = {
-      search: localFilters.search || '',
+      search: filters.search || '',
       sort: 'name',
     } as CourseSearchParams
-    setLocalFilters(clearedFilters)
     onChange(clearedFilters)
-  }
+  }, [filters.search, onChange])
 
-  const getActiveFiltersCount = () => {
+  // アクティブなフィルター数をメモ化
+  const activeFiltersCount = useMemo(() => {
     const keys: (keyof CourseSearchParams)[] = [
       'department', 'faculty', 'category', 'semester', 'credits', 'min_rating', 'max_difficulty'
     ]
-    return keys.filter(key => localFilters[key] !== undefined && localFilters[key] !== '').length
-  }
+    return keys.filter(key => filters[key] !== undefined && filters[key] !== '').length
+  }, [filters])
 
-  const getActiveFiltersList = () => {
+  // アクティブなフィルターリストをメモ化
+  const activeFiltersList = useMemo(() => {
     const activeFilters: { key: string; label: string; value: string }[] = []
     
-    if (localFilters.department) {
+    if (filters.department) {
       activeFilters.push({
         key: 'department',
         label: '学科',
-        value: localFilters.department
+        value: filters.department
       })
     }
     
-    if (localFilters.faculty) {
+    if (filters.faculty) {
       activeFilters.push({
         key: 'faculty',
         label: '学部',
-        value: localFilters.faculty
+        value: filters.faculty
       })
     }
     
-    if (localFilters.category) {
+    if (filters.category) {
       activeFilters.push({
         key: 'category',
         label: 'カテゴリ',
-        value: localFilters.category
+        value: filters.category
       })
     }
     
-    if (localFilters.semester) {
+    if (filters.semester) {
       activeFilters.push({
         key: 'semester',
         label: '開講時期',
-        value: localFilters.semester
+        value: filters.semester
       })
     }
     
-    if (localFilters.credits) {
+    if (filters.credits) {
       activeFilters.push({
         key: 'credits',
         label: '単位数',
-        value: `${localFilters.credits}単位`
+        value: `${filters.credits}単位`
       })
     }
     
-    if (localFilters.min_rating) {
+    if (filters.min_rating) {
       activeFilters.push({
         key: 'min_rating',
         label: '最低評価',
-        value: `${localFilters.min_rating}以上`
+        value: `${filters.min_rating}以上`
       })
     }
     
-    if (localFilters.max_difficulty) {
+    if (filters.max_difficulty) {
       activeFilters.push({
         key: 'max_difficulty',
         label: '最大難易度',
-        value: `${localFilters.max_difficulty}以下`
+        value: `${filters.max_difficulty}以下`
       })
     }
 
     return activeFilters
-  }
+  }, [filters])
 
-  const removeFilter = (key: string) => {
+  const removeFilter = useCallback((key: string) => {
     handleFilterChange(key as keyof CourseSearchParams, undefined)
-  }
-
-  const activeFiltersCount = getActiveFiltersCount()
-  const activeFiltersList = getActiveFiltersList()
+  }, [handleFilterChange])
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -203,8 +196,7 @@ export function CourseFilters({
 
         {/* ソート */}
         <Select
-          key={`sort-${localFilters.sort || 'name'}`}
-          value={localFilters.sort || 'name'}
+          value={filters.sort || 'name'}
           onValueChange={(value) => handleFilterChange('sort', value)}
         >
           <SelectTrigger className="w-48">
@@ -267,8 +259,7 @@ export function CourseFilters({
                   学部
                 </label>
                 <Select
-                  key={`faculty-${localFilters.faculty || ''}`}
-                  value={localFilters.faculty || ''}
+                  value={filters.faculty || ''}
                   onValueChange={(value) => handleFilterChange('faculty', value || undefined)}
                 >
                   <SelectTrigger>
@@ -291,8 +282,7 @@ export function CourseFilters({
                   学科・専攻
                 </label>
                 <Select
-                  key={`department-${localFilters.department || ''}`}
-                  value={localFilters.department || ''}
+                  value={filters.department || ''}
                   onValueChange={(value) => handleFilterChange('department', value || undefined)}
                 >
                   <SelectTrigger>
@@ -315,8 +305,7 @@ export function CourseFilters({
                   カテゴリ
                 </label>
                 <Select
-                  key={`category-${localFilters.category || ''}`}
-                  value={localFilters.category || ''}
+                  value={filters.category || ''}
                   onValueChange={(value) => handleFilterChange('category', value || undefined)}
                 >
                   <SelectTrigger>
@@ -339,8 +328,7 @@ export function CourseFilters({
                   開講時期
                 </label>
                 <Select
-                  key={`semester-${localFilters.semester || ''}`}
-                  value={localFilters.semester || ''}
+                  value={filters.semester || ''}
                   onValueChange={(value) => handleFilterChange('semester', value || undefined)}
                 >
                   <SelectTrigger>
@@ -363,8 +351,7 @@ export function CourseFilters({
                   単位数
                 </label>
                 <Select
-                  key={`credits-${localFilters.credits || ''}`}
-                  value={localFilters.credits ? localFilters.credits.toString() : ''}
+                  value={filters.credits ? filters.credits.toString() : ''}
                   onValueChange={(value) => handleFilterChange('credits', value ? parseInt(value) : undefined)}
                 >
                   <SelectTrigger>
@@ -387,8 +374,7 @@ export function CourseFilters({
                   最低評価
                 </label>
                 <Select
-                  key={`min_rating-${localFilters.min_rating || ''}`}
-                  value={localFilters.min_rating ? localFilters.min_rating.toString() : ''}
+                  value={filters.min_rating ? filters.min_rating.toString() : ''}
                   onValueChange={(value) => handleFilterChange('min_rating', value ? parseFloat(value) : undefined)}
                 >
                   <SelectTrigger>
