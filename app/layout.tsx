@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/context";
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
-import ReactPlugin from "@stagewise-plugins/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,11 +30,6 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
-          <StagewiseToolbar
-            config={{
-              plugins: [ReactPlugin],
-            }}
-          />
         </AuthProvider>
       </body>
     </html>

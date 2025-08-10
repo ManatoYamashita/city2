@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Home, BookOpen, User, Search } from 'lucide-react'
+import { Home, BookOpen, User, Search, PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
@@ -47,6 +47,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <span>授業検索</span>
               </Link>
               <Link
+                href="/courses/register"
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <PlusCircle size={18} />
+                <span>授業を登録</span>
+              </Link>
+              <Link
                 href="/profile"
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
@@ -57,10 +64,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             {/* ユーザーメニュー */}
             <div className="flex items-center gap-2">
-              <Button variant="outline" asChild>
+              <Button variant="outline" size="sm" asChild>
                 <Link href="/courses">授業を探す</Link>
               </Button>
-              <Button asChild>
+              <Button variant="default" size="sm" asChild>
+                <Link href="/courses/register" className="flex items-center gap-1">
+                  <PlusCircle size={16} />
+                  <span className="hidden sm:inline">授業を登録</span>
+                  <span className="sm:hidden">登録</span>
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
                 <Link href="/logout">ログアウト</Link>
               </Button>
             </div>
@@ -96,6 +110,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <li>
                   <Link href="/courses" className="hover:text-gray-900">
                     授業検索
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/courses/register" className="hover:text-gray-900">
+                    授業を登録
                   </Link>
                 </li>
                 <li>

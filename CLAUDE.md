@@ -15,9 +15,10 @@ This project implements a university course review platform using Kiro-style Spe
 - Custom steering docs for specialized contexts
 
 ### Current Project Status
-- **Main Feature**: university-course-review-platform (Ready for Implementation)
+- **Main Feature**: university-course-review-platform (Implementation in Progress)
 - **Tech Stack**: Next.js 15 App Router + Supabase + Stripe + TailwindCSS + ShadcnUI
-- **Implementation Status**: All specs approved, ready to begin development
+- **Implementation Status**: Core features implemented, database schema deployed
+- **Current State**: Functional university course review platform with authentication, reviews, premium features, admin dashboard
 - Use `/spec-status university-course-review-platform` to check detailed progress
 
 ### Active Specifications
@@ -31,43 +32,64 @@ This project implements a university course review platform using Kiro-style Spe
 ## Development Guidelines
 - Think in English, but generate responses in Japanese (思考は英語、回答の生成は日本語で行うように)
 
-## Implementation Commands
+## Development Commands
 
-### Project Setup (Ready to Execute)
-Based on the approved task plan in `.kiro/specs/university-course-review-platform/tasks.md`:
-
+### Core Development Workflow
 ```bash
-# 1. Initialize Next.js 15 project (Task 1.1)
-npx create-next-app@latest city2 --typescript --tailwind --eslint --app --no-src-dir
-cd city2
+# Development server (port 3000)
+npm run dev          # Start Next.js development server
 
-# 2. Install dependencies (Task 1.2)
-npm install @supabase/supabase-js @supabase/auth-helpers-nextjs
-npm install stripe @stripe/stripe-js
-npm install @radix-ui/react-* class-variance-authority clsx tailwind-merge lucide-react
-npm install -D @types/node
-
-# 3. Development commands
-npm run dev          # Start development server
+# Production build and deployment
 npm run build        # Build for production
-npm run lint         # Run ESLint
-npm run test         # Run tests (after Jest setup)
+npm run start        # Start production server
 
-# 4. Testing setup (Task 12.1-12.3)
-npm install -D jest @testing-library/react @testing-library/jest-dom
-npm install -D @playwright/test  # E2E testing
+# Code quality and linting
+npm run lint         # Run ESLint with Next.js rules
 ```
 
-### Database Setup Commands
+### Database Management
 ```bash
-# Supabase CLI setup (Task 2.1)
-npx supabase init
-npx supabase start
-npx supabase db reset
-
-# Generate TypeScript types
-npx supabase gen types typescript --local > types/supabase.ts
+# Database setup (see SETUP_DATABASE.md for complete guide)
+# 1. Apply schema via Supabase Dashboard SQL Editor
+# 2. Execute supabase-complete-setup.sql for full schema
+# 3. Run verification script:
+npx tsx scripts/verify-supabase-setup.ts
 ```
+
+### Component Development (ShadcnUI)
+```bash
+# Add new shadcn/ui components
+npx shadcn@latest add [component-name]
+
+# Current shadcn configuration:
+# - Style: new-york
+# - Base color: neutral
+# - CSS variables: enabled
+# - Icon library: lucide-react
+```
+
+## Critical Development Notes
+
+### Database Setup Requirements
+⚠️ **IMPORTANT**: Database setup is required for application functionality
+1. **Setup Guide**: Follow `SETUP_DATABASE.md` for complete Supabase configuration
+2. **Schema Files**: Execute `supabase-complete-setup.sql` via Supabase Dashboard
+3. **Environment**: Configure `.env.local` with Supabase credentials
+4. **Verification**: Run `npx tsx scripts/verify-supabase-setup.ts` to validate setup
+
+### Architecture Patterns
+- **Route Groups**: Uses Next.js 15 route groups for organization: `(auth)`, `(dashboard)`, `(admin)`
+- **Server Components**: Leverage RSC for data fetching and SEO optimization
+- **Type Safety**: Comprehensive TypeScript coverage with Zod validation schemas
+- **Component Organization**: Feature-based component structure with proper index exports
+- **State Management**: React hooks for client state, Supabase for server state
+
+### Code Conventions
+- **Import Aliases**: Use `@/` prefix for all internal imports (`@/components`, `@/lib`, etc.)
+- **Component Naming**: PascalCase for components, kebab-case for files
+- **API Routes**: Follow REST conventions with proper HTTP methods and status codes
+- **Error Handling**: Implement proper error boundaries and user-friendly error messages
+- **Form Validation**: Use react-hook-form with Zod schemas for type-safe form handling
 
 ## Spec-Driven Development Workflow
 
@@ -186,31 +208,55 @@ This project follows a structured spec-driven development approach with these ke
 4. **Stripe Integration**: Premium subscription and payment processing
 5. **Component Architecture**: ShadcnUI + TailwindCSS design system
 
-### Key Directory Structure
+### Implemented Directory Structure
 ```
 city2/
-├── .claude/commands/           # Custom slash commands for spec workflow
-├── .kiro/
-│   ├── steering/              # Project knowledge and standards
-│   └── specs/                 # Feature specifications and task tracking
-├── app/                       # Next.js 15 App Router (when implemented)
-│   ├── (auth)/               # Authentication routes
-│   ├── (dashboard)/          # Main application routes
-│   ├── admin/                # Admin dashboard
-│   └── api/                  # API routes
-├── components/               # Reusable components
-├── lib/                      # Utilities and integrations
+├── app/                       # Next.js 15 App Router (implemented)
+│   ├── (auth)/               # Authentication: login, register, reset-password
+│   ├── (dashboard)/          # Main app: courses, dashboard, premium, checkout
+│   ├── (admin)/              # Admin panel: analytics, users, payments management
+│   ├── api/                  # API routes: courses, reviews, stripe, admin endpoints
+│   ├── globals.css           # TailwindCSS 4.0 global styles
+│   └── layout.tsx            # Root layout with providers
+├── components/               # Organized component library
+│   ├── auth/                 # LoginForm, RegisterForm, PasswordResetForm
+│   ├── course/               # CourseCard, CourseDetail, CourseList, CourseRegistrationForm
+│   ├── review/               # ReviewCard, ReviewForm, ReviewList, RatingStars
+│   ├── stripe/               # CheckoutForm, StripeProvider
+│   ├── filters/              # CourseFilters for advanced search
+│   ├── premium/              # AdvancedSearch, DataAnalytics (premium features)
+│   └── ui/                   # ShadcnUI components (button, card, form, etc.)
+├── lib/                      # Core integrations and utilities
+│   ├── supabase/             # Database client (browser, server, SSR)
+│   ├── stripe/               # Payment processing (client, config)
+│   ├── auth/                 # Authentication helpers and admin context
+│   └── validations/          # Zod schemas (course, review, stripe)
+├── hooks/                    # Custom React hooks
+│   ├── useAuth.ts            # Authentication state management
+│   ├── useCourseSearch.ts    # Course filtering and search
+│   └── useSubscription.ts    # Premium subscription status
 ├── types/                    # TypeScript definitions
-└── hooks/                    # Custom React hooks
+│   ├── auth.ts, course.ts, review.ts
+│   ├── stripe.ts, admin.ts   # Organized by feature domain
+│   └── index.ts              # Centralized exports
+├── scripts/                  # Utility scripts
+│   └── verify-supabase-setup.ts  # Database setup verification
+└── docs/                     # Project documentation
+    ├── technical-overview.md, user-guide.md
+    ├── features-admin.md, business-security.md
+    └── README.md
 ```
 
-### Implementation Phases
-Based on the approved task plan:
-1. **Phase 1 (Tasks 1-3)**: Project setup, database, authentication
-2. **Phase 2 (Tasks 4-5)**: Core features (courses, reviews)
-3. **Phase 3 (Tasks 6-8)**: Advanced features (admin, premium, UI)
-4. **Phase 4 (Tasks 9-11)**: Optimization and analytics
-5. **Phase 5 (Tasks 12-13)**: Testing and deployment
+### Implementation Status
+Major features implemented:
+1. ✅ **Authentication System**: Complete login/register/password reset with Supabase Auth
+2. ✅ **Course Management**: Course listing, detailed view, search and filtering
+3. ✅ **Review System**: Student reviews with rating stars, helpful votes, anonymization
+4. ✅ **Premium Features**: Stripe integration, subscription plans, advanced search, data analytics
+5. ✅ **Admin Dashboard**: User management, payment tracking, analytics, course moderation
+6. ✅ **Database Schema**: Complete Supabase setup with RLS policies and relationships
+7. 🟡 **Testing & Deployment**: Testing framework setup pending
+8. 🟡 **Performance Optimization**: SEO and caching implementation pending
 
 ## Technical Context
 
