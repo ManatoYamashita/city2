@@ -94,14 +94,41 @@ export const authHelpers = {
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        // Profile not found
+      // 他のHTTP/DBエラーはそのまま上位に伝搬
+      throw new AuthError(error.message, error.code)
+    }
+
+    // プロファイルが未作成の場合は即時生成して返す
+    if (!data) {
+      // ユーザメタから初期値を補完
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      const displayName = (user?.user_metadata as any)?.display_name as string | undefined
+
+      const { data: created, error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: userId,
+            display_name: displayName,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'id' }
+        )
+        .select()
+        .single()
+
+      if (upsertError) {
+        // 競合などで取得できない場合はnullで返す（以降のUIは空表示で動作）
         return null
       }
-      throw new AuthError(error.message, error.code)
+
+      return created as Profile
     }
 
     return data

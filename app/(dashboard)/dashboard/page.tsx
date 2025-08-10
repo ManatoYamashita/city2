@@ -3,66 +3,72 @@ import Link from 'next/link'
 import { BookOpen, Users, TrendingUp, Star } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'ダッシュボード',
   description: 'City2ダッシュボード - あなたの学習をサポート',
 }
 
-// TODO: 実際のデータを取得する関数
+// Supabaseから実データを取得する関数
 async function getDashboardData() {
-  // これは仮のデータです。実際にはAPIから取得します
+  const supabase = await createClient()
+
+  // 認証済みユーザーの取得（未ログイン時はnull）
+  const { data: userData } = await supabase.auth.getUser()
+  const userId = userData?.user?.id
+
+  // 並行で集計を取得
+  const [
+    { count: totalCourses },
+    { count: totalReviews },
+    averageRatingResult,
+    { count: userReviewCount },
+    { data: recentCoursesRaw },
+    { data: popularCoursesRaw },
+  ] = await Promise.all([
+    supabase.from('courses').select('*', { count: 'exact', head: true }),
+    supabase.from('reviews').select('*', { count: 'exact', head: true }),
+    // PostgRESTの集計関数を利用して平均を取得
+    supabase.from('courses').select('avg(average_rating)'),
+    supabase
+      .from('reviews')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId || ''),
+    supabase
+      .from('courses')
+      .select('id,name,instructor,average_rating,total_reviews,created_at')
+      .order('created_at', { ascending: false })
+      .limit(3),
+    supabase
+      .from('courses')
+      .select('id,name,instructor,average_rating,total_reviews')
+      .order('total_reviews', { ascending: false })
+      .limit(3),
+  ])
+
+  // 平均評価の抽出（データがない場合は0）
+  const avgValue = Array.isArray(averageRatingResult?.data)
+    ? (averageRatingResult.data[0] as any)?.avg ?? 0
+    : 0
+  const averageRating = Number.isFinite(avgValue) ? parseFloat(Number(avgValue).toFixed(1)) : 0
+
+  // 表示用のコースデータに整形
+  const mapCourse = (c: any) => ({
+    id: c.id as string,
+    name: c.name as string,
+    instructor: c.instructor as string,
+    rating: typeof c.average_rating === 'number' ? parseFloat(c.average_rating.toFixed(1)) : 0,
+    reviewCount: (c.total_reviews as number) ?? 0,
+  })
+
   return {
-    totalCourses: 1247,
-    totalReviews: 3892,
-    averageRating: 4.1,
-    userReviewCount: 5,
-    recentCourses: [
-      {
-        id: '1',
-        name: 'コンピュータサイエンス入門',
-        instructor: '田中太郎',
-        rating: 4.2,
-        reviewCount: 89,
-      },
-      {
-        id: '2',
-        name: '微分積分学II',
-        instructor: '佐藤花子',
-        rating: 3.8,
-        reviewCount: 67,
-      },
-      {
-        id: '3',
-        name: '学術英語',
-        instructor: 'John Smith',
-        rating: 4.5,
-        reviewCount: 134,
-      },
-    ],
-    popularCourses: [
-      {
-        id: '1',
-        name: 'コンピュータサイエンス入門',
-        instructor: '田中太郎',
-        rating: 4.2,
-        reviewCount: 89,
-      },
-      {
-        id: '3',
-        name: '学術英語',
-        instructor: 'John Smith',
-        rating: 4.5,
-        reviewCount: 134,
-      },
-      {
-        id: '4',
-        name: 'ミクロ経済学',
-        instructor: '鈴木一郎',
-        rating: 4.0,
-        reviewCount: 78,
-      },
-    ],
+    totalCourses: totalCourses || 0,
+    totalReviews: totalReviews || 0,
+    averageRating,
+    userReviewCount: userId ? userReviewCount || 0 : 0,
+    recentCourses: (recentCoursesRaw || []).map(mapCourse),
+    popularCourses: (popularCoursesRaw || []).map(mapCourse),
   }
 }
 
